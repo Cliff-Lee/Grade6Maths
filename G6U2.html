@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unit 2 Review - See think wonder!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .question {
+            background-color: #e0e0e0;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .question div {
+            cursor: pointer;
+            padding: 5px;
+        }
+        .answer {
+            display: none;
+            padding-top: 10px;
+            color: green;
+            font-style: italic;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        footer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Unit 2 Review - See think wonder!</h1>
+    <img src="Unit2.png" alt="Unit Poster" width="300">
+    <div class="container" id="questions-container">
+        <!-- Questions will be dynamically inserted here -->
+    </div>
+
+    <button onclick="generateQuestions()">Refresh Questions</button>
+
+    <script>
+        const topicsWithQuestions = [
+            {
+                topic: "Define what an integer is and recognize how integers can be used to represent quantities",
+                questions: [
+                    { question: "What is an integer?", answer: "An integer is a whole number that can be positive, negative, or zero." },
+                    { question: "Give an example of how integers can represent real-world quantities.", answer: "Temperatures below zero can be represented by negative integers." },
+                    { question: "Is zero considered an integer?", answer: "Yes, zero is an integer." }
+                ]
+            },
+            {
+                topic: "Understand that integers can be located on the number line",
+                questions: [
+                    { question: "Where are negative integers located on the number line?", answer: "To the left of zero." },
+                    { question: "Where are positive integers located on the number line?", answer: "To the right of zero." },
+                    { question: "What does the point zero represent on the number line?", answer: "It represents the origin or neutral point separating positive and negative numbers." }
+                ]
+            },
+            {
+                topic: "Graph a set of integers on a horizontal and vertical number line",
+                questions: [
+                    { question: "Plot the integers -3, 0, and 4 on a horizontal number line.", answer: "Place -3 to the left of zero, 0 at the origin, and 4 to the right of zero." },
+                    { question: "How do you represent the integer 5 on a vertical number line?", answer: "Place it above zero on the vertical line." },
+                    { question: "Graph the integers -2, 1, and -5 on a vertical number line.", answer: "Place -5 at the lowest point, then -2 above it, and 1 above zero." }
+                ]
+            },
+            {
+                topic: "Understand what the opposite of an integer is and locate it on a number line",
+                questions: [
+                    { question: "What is the opposite of -7?", answer: "+7" },
+                    { question: "Where is the opposite of +3 located on the number line?", answer: "At -3, which is the same distance from zero but on the opposite side." },
+                    { question: "Find the opposite of 0.", answer: "The opposite of 0 is 0." }
+                ]
+            },
+            {
+                topic: "Find the opposite of the opposite of an integer",
+                questions: [
+                    { question: "What is the opposite of the opposite of -5?", answer: "-5" },
+                    { question: "Compute the opposite of the opposite of +8.", answer: "+8" },
+                    { question: "Explain the opposite of the opposite of an integer.", answer: "It results in the original integer." }
+                ]
+            },
+            {
+                topic: "Find the absolute value of a number",
+                questions: [
+                    { question: "What is the absolute value of -9?", answer: "9" },
+                    { question: "Find the absolute value of +4.", answer: "4" },
+                    { question: "Explain the absolute value of zero.", answer: "The absolute value of 0 is 0." }
+                ]
+            },
+            {
+                topic: "Compare and order integers using a number line",
+                questions: [
+                    { question: "Which is greater: -2 or 3?", answer: "3 is greater than -2." },
+                    { question: "Order the integers -1, 4, -3 from least to greatest.", answer: "-3, -1, 4" },
+                    { question: "Is -5 less than -2?", answer: "Yes, -5 is less than -2." }
+                ]
+            },
+            {
+                topic: "Distinguish between comparisons of absolute value and comparisons of order",
+                questions: [
+                    { question: "Which has a greater absolute value: -6 or 5?", answer: "-6 has a greater absolute value (6 vs. 5)." },
+                    { question: "Compare -7 and -3 based on their order.", answer: "-7 is less than -3." },
+                    { question: "Does a greater absolute value always mean a greater number?", answer: "No, because the sign matters in ordering integers." }
+                ]
+            },
+            {
+                topic: "Define what a rational number is, and recognize how it includes the sets of natural numbers, whole numbers, and integers",
+                questions: [
+                    { question: "What is a rational number?", answer: "A number that can be expressed as a fraction or ratio of two integers." },
+                    { question: "Are all integers rational numbers?", answer: "Yes, because they can be written as a fraction with denominator 1." },
+                    { question: "Do rational numbers include decimals?", answer: "Yes, if the decimal terminates or repeats." }
+                ]
+            },
+            {
+                topic: "Graph a set of rational numbers on a number line",
+                questions: [
+                    { question: "Plot 0.5 on a number line.", answer: "Place it halfway between 0 and 1." },
+                    { question: "Where is -1.25 located on the number line?", answer: "1 and 1/4 units to the left of zero." },
+                    { question: "Graph 2/3 on the number line.", answer: "Place it between 0.5 and 1, closer to 0.666..." }
+                ]
+            },
+            {
+                topic: "Understand that the absolute value of a rational number is the distance the number is from zero on the number line",
+                questions: [
+                    { question: "What is the absolute value of -3.5?", answer: "3.5" },
+                    { question: "Explain the absolute value of 2/3.", answer: "It is 2/3, the distance from zero." },
+                    { question: "Find the absolute value of -0.75.", answer: "0.75" }
+                ]
+            },
+            {
+                topic: "Compare two rational numbers by reasoning about their signs and locations on a number line",
+                questions: [
+                    { question: "Which is greater: -0.5 or -0.8?", answer: "-0.5 is greater because it is closer to zero." },
+                    { question: "Compare 1/4 and 0.2.", answer: "1/4 (0.25) is greater than 0.2." },
+                    { question: "Is -2/3 less than 1/3?", answer: "Yes, because negative numbers are less than positive numbers." }
+                ]
+            },
+            {
+                topic: "Write an inequality to compare two rational numbers",
+                questions: [
+                    { question: "Write an inequality comparing -1.5 and -2.", answer: "-1.5 > -2" },
+                    { question: "Express that 3/5 is less than 7/8.", answer: "3/5 < 7/8" },
+                    { question: "Compare -0.25 and 0.", answer: "-0.25 < 0" }
+                ]
+            },
+            {
+                topic: "Understand how a number line can be used to order a set of numbers",
+                questions: [
+                    { question: "Order the numbers 0.1, -0.2, 0.5 from least to greatest.", answer: "-0.2, 0.1, 0.5" },
+                    { question: "Use a number line to order -1, 2, -3.", answer: "-3, -1, 2" },
+                    { question: "Place 0, -2/3, and 1/3 on a number line.", answer: "-2/3, 0, 1/3" }
+                ]
+            },
+            {
+                topic: "Understand that the coordinate plane helps locate points",
+                questions: [
+                    { question: "What are the two axes in a coordinate plane?", answer: "The x-axis (horizontal) and y-axis (vertical)." },
+                    { question: "How do ordered pairs locate points?", answer: "By providing horizontal (x) and vertical (y) positions." },
+                    { question: "What is the origin?", answer: "The point (0, 0) where the x-axis and y-axis intersect." }
+                ]
+            },
+            {
+                topic: "Determine the x and y for ordered pairs graphed within the four quadrants of the coordinate plane",
+                questions: [
+                    { question: "For the point (3, -2), what is the x-coordinate?", answer: "3" },
+                    { question: "For the point (-4, 5), what is the y-coordinate?", answer: "5" },
+                    { question: "Identify the coordinates of a point located at x = -2 and y = -3.", answer: "(-2, -3)" }
+                ]
+            },
+            {
+                topic: "Identify the quadrant of the coordinate plane in which a given point is located",
+                questions: [
+                    { question: "In which quadrant is the point (2, 3)?", answer: "Quadrant I" },
+                    { question: "Identify the quadrant for the point (-5, -1).", answer: "Quadrant III" },
+                    { question: "Which quadrant is the point (-4, 6) in?", answer: "Quadrant II" }
+                ]
+            },
+            {
+                topic: "Identify an ordered pair that represents a point graphed on the coordinate plane and vice versa",
+                questions: [
+                    { question: "If a point is at x = 1, y = -2, what is the ordered pair?", answer: "(1, -2)" },
+                    { question: "Given the ordered pair (-3, 4), where is the point located?", answer: "3 units left of the origin and 4 units up." },
+                    { question: "What point is represented by the coordinates (0, -5)?", answer: "On the y-axis, 5 units down from the origin." }
+                ]
+            },
+            {
+                topic: "Graph ordered pairs with rational number coordinates in the coordinate plane",
+                questions: [
+                    { question: "Plot the point (1.5, -2.5) on the coordinate plane.", answer: "1.5 units right and 2.5 units down from the origin." },
+                    { question: "Graph the point (-0.75, 0.25).", answer: "0.75 units left and 0.25 units up from the origin." },
+                    { question: "Where is the point (2/3, -1/3) located?", answer: "Approximately 0.67 units right and 0.33 units down." }
+                ]
+            },
+            {
+                topic: "Recognize reflective properties of the coordinate plane",
+                questions: [
+                    { question: "What is the reflection of (4, 5) over the x-axis?", answer: "(4, -5)" },
+                    { question: "Find the reflection of (-3, -2) over the y-axis.", answer: "(3, -2)" },
+                    { question: "What point reflects (6, -1) over both axes?", answer: "(-6, 1)" }
+                ]
+            },
+            {
+                topic: "Understand when two ordered pairs differ only by signs, the points are reflections of each other across one or both axes",
+                questions: [
+                    { question: "Are the points (2, 3) and (-2, 3) reflections over an axis?", answer: "Yes, they are reflections over the y-axis." },
+                    { question: "How are the points (-4, -5) and (-4, 5) related?", answer: "They are reflections over the x-axis." },
+                    { question: "Describe the reflection between (7, -8) and (-7, 8).", answer: "They are reflections over both the x-axis and y-axis." }
+                ]
+            },
+            {
+                topic: "Find the horizontal distance between two points with the same y-coordinates",
+                questions: [
+                    { question: "What is the horizontal distance between (2, 5) and (-3, 5)?", answer: "5 units" },
+                    { question: "Calculate the distance between (7, -2) and (1, -2).", answer: "6 units" },
+                    { question: "Find the horizontal distance between (-4, 0) and (4, 0).", answer: "8 units" }
+                ]
+            },
+            {
+                topic: "Find the vertical distance between two points with the same x-coordinates",
+                questions: [
+                    { question: "What is the vertical distance between (3, -1) and (3, 4)?", answer: "5 units" },
+                    { question: "Calculate the distance between (-2, 6) and (-2, -2).", answer: "8 units" },
+                    { question: "Find the vertical distance between (0, -5) and (0, 5).", answer: "10 units" }
+                ]
+            },
+            {
+                topic: "Use absolute value to find the distance between points on the coordinate plane",
+                questions: [
+                    { question: "Find the distance between (5, 3) and (5, -2).", answer: "Distance = |3 - (-2)| = 5 units" },
+                    { question: "Calculate the distance between (-4, -7) and (2, -7).", answer: "Distance = |-4 - 2| = 6 units" },
+                    { question: "What is the distance between (0, 0) and (-6, 0)?", answer: "Distance = |0 - (-6)| = 6 units" }
+                ]
+            }
+        ];
+
+        function generateQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = ''; // Clear previous questions
+
+            // Shuffle topics and pick three random ones
+            const shuffledTopics = topicsWithQuestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            // Add selected topics and questions to the page
+            shuffledTopics.forEach((topicObj) => {
+                const topicDiv = document.createElement('div');
+                topicDiv.className = 'question';
+                topicDiv.innerHTML = `<strong>Topic:</strong> ${topicObj.topic}<br><br>`;
+                
+                // Display questions under each topic
+                const shuffledQuestions = topicObj.questions.sort(() => 0.5 - Math.random());
+                shuffledQuestions.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.innerHTML = `<div class="question-text" onclick="toggleAnswer('answer-${topicObj.topic}-${index}')">${q.question}</div>
+                                             <div class="answer" id="answer-${topicObj.topic}-${index}">${q.answer}</div>`;
+                    topicDiv.appendChild(questionDiv);
+                });
+                
+                container.appendChild(topicDiv);
+            });
+        }
+
+        function toggleAnswer(answerId) {
+            const answerDiv = document.getElementById(answerId);
+            if (answerDiv.style.display === 'none' || answerDiv.style.display === '') {
+                answerDiv.style.display = 'block';
+            } else {
+                answerDiv.style.display = 'none';
+            }
+        }
+
+        // Generate initial set of questions when the page loads
+        window.onload = generateQuestions;
+    </script>
+    <footer>
+        <p>Created by cliffpackman@gmail.com on 24/9/2024</p>
+    </footer>
+</body>
+</html>

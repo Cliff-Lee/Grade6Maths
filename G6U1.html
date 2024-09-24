@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unit 1 Review - Spot the difference</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .question {
+            background-color: #e0e0e0;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .question div {
+            cursor: pointer;
+            padding: 5px;
+        }
+        .answer {
+            display: none;
+            padding-top: 10px;
+            color: green;
+            font-style: italic;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        footer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Unit 1 Review - Spot the difference</h1>
+    <img src="Unit1.png" alt="Unit Poster" width="300">
+    <div class="container" id="questions-container">
+        <!-- Questions will be dynamically inserted here -->
+    </div>
+
+    <button onclick="generateQuestions()">Refresh Questions</button>
+
+    <script>
+        const topicsWithQuestions = [
+            {
+                topic: "Model percentages using diagrams including percentages greater than 100% and less than 1%",
+                questions: [
+                    { question: "Draw a diagram to represent 150%.", answer: "A diagram showing 1 whole and half of another to represent 150%." },
+                    { question: "How would you model 0.5% using a diagram?", answer: "A diagram showing half of 1% shaded, indicating 0.5%." },
+                    { question: "Represent 250% using a visual model.", answer: "A diagram with 2 whole units and half of another shaded to show 250%." }
+                ]
+            },
+            {
+                topic: "Represent percents as fractions and decimals including percents greater than 100%",
+                questions: [
+                    { question: "Convert 125% to a fraction and a decimal.", answer: "Fraction: 5/4 or 1¼; Decimal: 1.25" },
+                    { question: "What is 250% as a fraction and decimal?", answer: "Fraction: 5/2 or 2½; Decimal: 2.5" },
+                    { question: "Express 75% as a fraction and a decimal.", answer: "Fraction: 3/4; Decimal: 0.75" }
+                ]
+            },
+            {
+                topic: "Represent fractions and decimals as percents including mixed numbers and decimals greater than 1",
+                questions: [
+                    { question: "Convert 1.5 to a percent.", answer: "150%" },
+                    { question: "Express 2¾ as a percent.", answer: "275%" },
+                    { question: "What percent is represented by the decimal 0.85?", answer: "85%" }
+                ]
+            },
+            {
+                topic: "Divide multi-digit numbers",
+                questions: [
+                    { question: "What is 756 ÷ 12?", answer: "63" },
+                    { question: "Calculate 1,248 ÷ 16.", answer: "78" },
+                    { question: "Divide 9,876 by 24.", answer: "411.5" }
+                ]
+            },
+            {
+                topic: "Perform operations of addition, subtraction, multiplication, and division with multi-digit decimals",
+                questions: [
+                    { question: "Calculate 12.56 + 7.849.", answer: "20.409" },
+                    { question: "Subtract 45.67 - 23.891.", answer: "21.779" },
+                    { question: "Multiply 3.6 × 4.25.", answer: "15.3" },
+                    { question: "Divide 98.76 ÷ 4.2.", answer: "23.51428571..." }
+                ]
+            },
+            {
+                topic: "Find reciprocals of fractions and whole numbers",
+                questions: [
+                    { question: "What is the reciprocal of 5?", answer: "1/5" },
+                    { question: "Find the reciprocal of 3/4.", answer: "4/3" },
+                    { question: "What is the reciprocal of 7/2?", answer: "2/7" }
+                ]
+            },
+            {
+                topic: "Divide whole numbers by fractions",
+                questions: [
+                    { question: "Calculate 6 ÷ (1/2).", answer: "12" },
+                    { question: "What is 9 ÷ (3/4)?", answer: "12" },
+                    { question: "Divide 8 by (2/3).", answer: "12" }
+                ]
+            },
+            {
+                topic: "Divide fractions by fractions",
+                questions: [
+                    { question: "Compute (3/4) ÷ (1/2).", answer: "1.5 or 3/2" },
+                    { question: "What is (5/6) ÷ (2/3)?", answer: "1.25 or 5/4" },
+                    { question: "Divide (7/8) by (1/4).", answer: "3.5 or 7/2" }
+                ]
+            },
+            {
+                topic: "Divide with whole and mixed numbers",
+                questions: [
+                    { question: "Calculate 5 ÷ 1½.", answer: "3.333... or 10/3" },
+                    { question: "What is 7½ ÷ 3?", answer: "2.5" },
+                    { question: "Divide 10 by 2¼.", answer: "4.444... or 40/9" }
+                ]
+            },
+            {
+                topic: "Use various strategies to divide fractions with mixed and whole numbers",
+                questions: [
+                    { question: "Compute (2/3) ÷ 4 using a visual model.", answer: "1/6" },
+                    { question: "Divide 3 by (3/5) using the reciprocal method.", answer: "5" },
+                    { question: "Calculate (1½) ÷ (¾) using fraction multiplication.", answer: "2" }
+                ]
+            },
+            {
+                topic: "Divide mixed number by a mixed number",
+                questions: [
+                    { question: "What is 2½ ÷ 1¼?", answer: "2" },
+                    { question: "Calculate 3⅓ ÷ 1⅔.", answer: "2" },
+                    { question: "Divide 4½ by 1½.", answer: "3" }
+                ]
+            }
+        ];
+
+        function generateQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = ''; // Clear previous questions
+
+            // Shuffle topics and pick three random ones
+            const shuffledTopics = topicsWithQuestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            // Add selected topics and questions to the page
+            shuffledTopics.forEach((topicObj) => {
+                const topicDiv = document.createElement('div');
+                topicDiv.className = 'question';
+                topicDiv.innerHTML = `<strong>Topic:</strong> ${topicObj.topic}<br><br>`;
+                
+                // Display questions under each topic
+                const shuffledQuestions = topicObj.questions.sort(() => 0.5 - Math.random());
+                shuffledQuestions.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.innerHTML = `<div class="question-text" onclick="toggleAnswer('answer-${topicObj.topic}-${index}')">${q.question}</div>
+                                             <div class="answer" id="answer-${topicObj.topic}-${index}">${q.answer}</div>`;
+                    topicDiv.appendChild(questionDiv);
+                });
+                
+                container.appendChild(topicDiv);
+            });
+        }
+
+        function toggleAnswer(answerId) {
+            const answerDiv = document.getElementById(answerId);
+            if (answerDiv.style.display === 'none' || answerDiv.style.display === '') {
+                answerDiv.style.display = 'block';
+            } else {
+                answerDiv.style.display = 'none';
+            }
+        }
+
+        // Generate initial set of questions when the page loads
+        window.onload = generateQuestions;
+    </script>
+    <footer>
+        <p>Created by cliffpackman@gmail.com on 24/9/2024</p>
+    </footer>
+</body>
+</html>

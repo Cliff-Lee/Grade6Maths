@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unit 6 Review - Wrap it up</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .question {
+            background-color: #e0e0e0;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .question div {
+            cursor: pointer;
+            padding: 5px;
+        }
+        .answer {
+            display: none;
+            padding-top: 10px;
+            color: green;
+            font-style: italic;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        footer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Unit 6 Review - Wrap it up</h1>
+    <img src="Unit6.png" alt="Unit Poster" width="300">
+    <div class="container" id="questions-container">
+        <!-- Questions will be dynamically inserted here -->
+    </div>
+
+    <button onclick="generateQuestions()">Refresh Questions</button>
+
+    <script>
+        const topicsWithQuestions = [
+            {
+                topic: "Derive the area of a parallelogram from the area of a rectangle",
+                questions: [
+                    { question: "Explain how the area formula of a parallelogram relates to that of a rectangle.", answer: "By rearranging a parallelogram, it can form a rectangle with the same base and height, so the area formula is the same: Area = base × height." },
+                    { question: "What is the formula for the area of a parallelogram?", answer: "Area = base × height (A = b × h)" },
+                    { question: "How can cutting and rearranging a parallelogram help derive its area?", answer: "By cutting a triangle from one end and attaching it to the other, forming a rectangle." }
+                ]
+            },
+            {
+                topic: "Calculate the area of parallelograms and solve its applications",
+                questions: [
+                    { question: "Find the area of a parallelogram with base 10 cm and height 5 cm.", answer: "Area = 10 cm × 5 cm = 50 cm²" },
+                    { question: "A parallelogram has an area of 72 m² and a base of 8 m. What is its height?", answer: "Height = Area ÷ base = 72 m² ÷ 8 m = 9 m" },
+                    { question: "Calculate the area of a parallelogram with base 7 inches and height 4 inches.", answer: "Area = 7 in × 4 in = 28 in²" }
+                ]
+            },
+            {
+                topic: "Find the missing dimension of a parallelogram when given the area",
+                questions: [
+                    { question: "A parallelogram has an area of 60 cm² and a height of 5 cm. Find the base.", answer: "Base = Area ÷ height = 60 cm² ÷ 5 cm = 12 cm" },
+                    { question: "If the area of a parallelogram is 45 m² and the base is 9 m, what is the height?", answer: "Height = Area ÷ base = 45 m² ÷ 9 m = 5 m" },
+                    { question: "Find the base of a parallelogram with area 100 in² and height 10 in.", answer: "Base = 100 in² ÷ 10 in = 10 in" }
+                ]
+            },
+            {
+                topic: "Derive the area of a triangle from the area of a parallelogram",
+                questions: [
+                    { question: "How is the area formula of a triangle related to that of a parallelogram?", answer: "A triangle is half of a parallelogram, so its area is half that of a parallelogram: Area = (base × height) ÷ 2." },
+                    { question: "Explain how two congruent triangles can form a parallelogram.", answer: "By placing two identical triangles together along their bases, they form a parallelogram." },
+                    { question: "What is the formula for the area of a triangle?", answer: "Area = (base × height) ÷ 2" }
+                ]
+            },
+            {
+                topic: "Understand the connection between area formulas of different polygons",
+                questions: [
+                    { question: "How are the area formulas of rectangles and parallelograms similar?", answer: "Both use the formula Area = base × height." },
+                    { question: "Explain the relationship between the area formulas of triangles and parallelograms.", answer: "The area of a triangle is half the area of a parallelogram with the same base and height." },
+                    { question: "How can understanding one area formula help derive others?", answer: "By decomposing or rearranging shapes, you can see how their areas relate and derive new formulas." }
+                ]
+            },
+            {
+                topic: "Calculate the area of triangles and solve its applications",
+                questions: [
+                    { question: "Find the area of a triangle with base 8 cm and height 5 cm.", answer: "Area = (8 cm × 5 cm) ÷ 2 = 20 cm²" },
+                    { question: "A triangle has an area of 30 m² and a base of 10 m. What is its height?", answer: "Height = (Area × 2) ÷ base = (30 m² × 2) ÷ 10 m = 6 m" },
+                    { question: "Calculate the area of a triangle with base 12 inches and height 7 inches.", answer: "Area = (12 in × 7 in) ÷ 2 = 42 in²" }
+                ]
+            },
+            {
+                topic: "Find the missing dimension of a triangle when given the area",
+                questions: [
+                    { question: "A triangle has an area of 24 cm² and a height of 6 cm. Find the base.", answer: "Base = (Area × 2) ÷ height = (24 cm² × 2) ÷ 6 cm = 8 cm" },
+                    { question: "If the area of a triangle is 50 m² and the base is 10 m, what is the height?", answer: "Height = (Area × 2) ÷ base = (50 m² × 2) ÷ 10 m = 10 m" },
+                    { question: "Find the height of a triangle with area 35 in² and base 7 in.", answer: "Height = (35 in² × 2) ÷ 7 in = 10 in" }
+                ]
+            },
+            {
+                topic: "Derive the area of trapezoids by composing and decomposing into other shapes",
+                questions: [
+                    { question: "How can you derive the area formula of a trapezoid?", answer: "By decomposing a trapezoid into a rectangle and two triangles, or composing two congruent trapezoids to form a parallelogram." },
+                    { question: "What is the formula for the area of a trapezoid?", answer: "Area = (base₁ + base₂) × height ÷ 2" },
+                    { question: "Explain how averaging the bases relates to the area of a trapezoid.", answer: "The area is the average of the two bases multiplied by the height." }
+                ]
+            },
+            {
+                topic: "Understand the connections between the area formula for triangles, parallelograms, and trapezoids",
+                questions: [
+                    { question: "How does the area formula of a trapezoid relate to that of a parallelogram?", answer: "A trapezoid's area formula is similar but uses the average of the two bases instead of one base." },
+                    { question: "Explain the similarity between the area formulas of a triangle and trapezoid.", answer: "Both involve multiplying by height and dividing by 2; a triangle is a special case of a trapezoid with one base of length zero." },
+                    { question: "How can understanding one area formula help with others?", answer: "Recognizing the relationships allows you to adapt and derive formulas for different shapes." }
+                ]
+            },
+            {
+                topic: "Calculate the area of trapezoids and solve its applications",
+                questions: [
+                    { question: "Find the area of a trapezoid with bases 6 cm and 10 cm, and height 5 cm.", answer: "Area = ((6 cm + 10 cm) × 5 cm) ÷ 2 = 40 cm²" },
+                    { question: "A trapezoid has an area of 60 m², bases of 8 m and 12 m. What is its height?", answer: "Height = (Area × 2) ÷ (base₁ + base₂) = (60 m² × 2) ÷ (8 m + 12 m) = 6 m" },
+                    { question: "Calculate the area of a trapezoid with bases 7 in and 9 in, height 4 in.", answer: "Area = ((7 in + 9 in) × 4 in) ÷ 2 = 32 in²" }
+                ]
+            },
+            {
+                topic: "Find the missing dimension of a trapezoid when given the area",
+                questions: [
+                    { question: "A trapezoid has an area of 45 cm², bases of 5 cm and 10 cm. Find the height.", answer: "Height = (Area × 2) ÷ (base₁ + base₂) = (45 cm² × 2) ÷ (15 cm) = 6 cm" },
+                    { question: "If the area is 80 m², height is 8 m, and one base is 6 m, find the other base.", answer: "Other base = ((Area × 2) ÷ height) - base₁ = ((80 m² × 2) ÷ 8 m) - 6 m = (160 ÷ 8) - 6 = 14 m" },
+                    { question: "Find the height of a trapezoid with area 70 in², bases 8 in and 12 in.", answer: "Height = (70 in² × 2) ÷ (8 in + 12 in) = 7 in" }
+                ]
+            },
+            {
+                topic: "Find the area of regular polygons by decomposing the figure into other figures",
+                questions: [
+                    { question: "Explain how to find the area of a regular hexagon.", answer: "Divide it into six equilateral triangles and calculate the area of one triangle, then multiply by six." },
+                    { question: "How can you find the area of a regular pentagon?", answer: "Decompose it into five congruent isosceles triangles and sum their areas." },
+                    { question: "What is the general approach to finding the area of regular polygons?", answer: "Decompose into triangles or other shapes with known area formulas, then sum the areas." }
+                ]
+            },
+            {
+                topic: "Use their own strategy to solve real life problems involving area",
+                questions: [
+                    { question: "You need to carpet a room that is 12 ft by 15 ft. How much carpeting do you need?", answer: "Area = 12 ft × 15 ft = 180 ft²" },
+                    { question: "A garden in the shape of a triangle has a base of 10 m and height of 8 m. What is its area?", answer: "Area = (10 m × 8 m) ÷ 2 = 40 m²" },
+                    { question: "Calculate the area needed for a trapezoidal billboard with bases 20 ft and 15 ft, height 10 ft.", answer: "Area = ((20 ft + 15 ft) × 10 ft) ÷ 2 = 175 ft²" }
+                ]
+            },
+            {
+                topic: "Use the first quadrant of coordinate plane",
+                questions: [
+                    { question: "What are the coordinates of a point 5 units right and 3 units up from the origin?", answer: "(5, 3)" },
+                    { question: "Plot the point (7, 2) in the first quadrant.", answer: "7 units right and 2 units up from the origin." },
+                    { question: "Explain why all points in the first quadrant have positive coordinates.", answer: "Because both x and y values are positive in the first quadrant." }
+                ]
+            },
+            {
+                topic: "Use the coordinates to find the perimeter of regular and irregular polygons on the coordinate plane",
+                questions: [
+                    { question: "Given vertices at (0,0), (4,0), (4,3), (0,3), find the perimeter of the rectangle.", answer: "Perimeter = 2 × (length + width) = 2 × (4 + 3) = 14 units" },
+                    { question: "Calculate the perimeter of a triangle with vertices at (0,0), (6,0), (3,4).", answer: "Sides: 6 units, 5 units, and 5 units; Perimeter = 16 units" },
+                    { question: "Find the perimeter of a square with vertices at (1,1), (1,5), (5,5), (5,1).", answer: "Side length = 4 units; Perimeter = 4 × 4 = 16 units" }
+                ]
+            },
+            {
+                topic: "Use the coordinate plane to draw and find attributes of polygons",
+                questions: [
+                    { question: "Plot points (2,2), (6,2), (6,5), (2,5) and identify the shape.", answer: "It's a rectangle." },
+                    { question: "Calculate the area of a triangle with vertices at (0,0), (4,0), (2,3).", answer: "Area = (base × height) ÷ 2 = (4 × 3) ÷ 2 = 6 units²" },
+                    { question: "Find the lengths of sides of a right triangle with vertices at (1,1), (1,4), (5,1).", answer: "Sides: 3 units, 4 units, 5 units (Pythagorean triple)" }
+                ]
+            },
+            {
+                topic: "Recognise the properties of a rectangular prism",
+                questions: [
+                    { question: "How many faces does a rectangular prism have?", answer: "6 faces" },
+                    { question: "What shapes are the faces of a rectangular prism?", answer: "Rectangles (including squares as special rectangles)" },
+                    { question: "Describe the edges and vertices of a rectangular prism.", answer: "12 edges and 8 vertices" }
+                ]
+            },
+            {
+                topic: "Find the volume of rectangular prisms",
+                questions: [
+                    { question: "Calculate the volume of a rectangular prism with length 5 cm, width 3 cm, and height 4 cm.", answer: "Volume = length × width × height = 5 × 3 × 4 = 60 cm³" },
+                    { question: "What is the volume of a cube with sides of 6 m?", answer: "Volume = 6 m × 6 m × 6 m = 216 m³" },
+                    { question: "Find the volume of a box with dimensions 10 in, 8 in, and 2 in.", answer: "Volume = 10 × 8 × 2 = 160 in³" }
+                ]
+            },
+            {
+                topic: "Use unit cubes and apply the volume formula to find the volume of a rectangular prism with irregular edge lengths",
+                questions: [
+                    { question: "How many unit cubes fit into a prism measuring 7 cm × 3 cm × 5 cm?", answer: "Volume = 7 × 3 × 5 = 105 cm³; so 105 unit cubes" },
+                    { question: "Calculate the volume of a prism with fractional edges: 2.5 m × 4 m × 3 m.", answer: "Volume = 2.5 × 4 × 3 = 30 m³" },
+                    { question: "Find the volume of a prism with edges 1.5 in, 2 in, and 4 in.", answer: "Volume = 1.5 × 2 × 4 = 12 in³" }
+                ]
+            },
+            {
+                topic: "Find the missing dimension of a rectangular prism when given the volume",
+                questions: [
+                    { question: "A prism has a volume of 240 cm³, length 8 cm, width 5 cm. Find the height.", answer: "Height = Volume ÷ (length × width) = 240 ÷ (8 × 5) = 6 cm" },
+                    { question: "If the volume is 150 m³, width 5 m, height 5 m, find the length.", answer: "Length = Volume ÷ (width × height) = 150 ÷ (5 × 5) = 6 m" },
+                    { question: "A box has a volume of 180 in³, length 10 in, height 6 in. What is the width?", answer: "Width = Volume ÷ (length × height) = 180 ÷ (10 × 6) = 3 in" }
+                ]
+            },
+            {
+                topic: "Use their own strategy to solve real life problems involving volume",
+                questions: [
+                    { question: "How much water can a tank hold if it's 4 m long, 2 m wide, and 1.5 m high?", answer: "Volume = 4 × 2 × 1.5 = 12 m³" },
+                    { question: "Determine the volume of soil needed to fill a raised garden bed measuring 8 ft × 4 ft × 2 ft.", answer: "Volume = 8 × 4 × 2 = 64 ft³" },
+                    { question: "A shipping container is 20 ft long, 8 ft wide, and 8.5 ft high. What is its volume?", answer: "Volume = 20 × 8 × 8.5 = 1,360 ft³" }
+                ]
+            },
+            {
+                topic: "Make nets and surface area of rectangular prisms",
+                questions: [
+                    { question: "What is a net in geometry?", answer: "A two-dimensional shape that can be folded to form a three-dimensional figure." },
+                    { question: "How many rectangles are in the net of a rectangular prism?", answer: "Six rectangles." },
+                    { question: "Explain how to find the surface area of a rectangular prism using its net.", answer: "Calculate the area of each face (rectangle) and sum them all." }
+                ]
+            },
+            {
+                topic: "Recognise and derive nets of prisms with non-rectangular bases",
+                questions: [
+                    { question: "What shapes make up the net of a triangular prism?", answer: "Two triangles (bases) and three rectangles (lateral faces)." },
+                    { question: "Describe the net of a pentagonal prism.", answer: "Two pentagons and five rectangles." },
+                    { question: "How can you use a net to find the surface area of a prism?", answer: "Unfold the prism into its net, calculate the area of each face, and sum them." }
+                ]
+            },
+            {
+                topic: "Make nets and surface area of triangular prisms",
+                questions: [
+                    { question: "How many faces does a triangular prism have?", answer: "Five faces: 2 triangular bases and 3 rectangular sides." },
+                    { question: "Explain how to draw the net of a triangular prism.", answer: "Draw two congruent triangles and connect them with three rectangles." },
+                    { question: "Calculate the surface area of a triangular prism using its net.", answer: "Find the area of the two triangles and the three rectangles, then sum them." }
+                ]
+            },
+            {
+                topic: "Use a net to find the surface area of triangular prism with bases that are scalene and equilateral triangles",
+                questions: [
+                    { question: "How does the type of triangle base affect the net of a triangular prism?", answer: "The dimensions of the rectangles depend on the sides of the triangle base." },
+                    { question: "Find the surface area of a prism with equilateral triangle bases of side 4 cm and height 6 cm.", answer: "Calculate area of triangles and rectangles with given dimensions, then sum." },
+                    { question: "Explain why careful measurement is important when dealing with scalene triangle bases.", answer: "Because all sides are different lengths, affecting the dimensions of the lateral faces." }
+                ]
+            },
+            {
+                topic: "Make nets and surface area of pyramids",
+                questions: [
+                    { question: "What shapes make up the net of a square-based pyramid?", answer: "One square (base) and four triangles (sides)." },
+                    { question: "Describe the net of a triangular-based pyramid (tetrahedron).", answer: "Four triangles: one base and three sides." },
+                    { question: "How do you calculate the surface area of a pyramid using its net?", answer: "Calculate the area of the base and the areas of the triangular faces, then sum them." }
+                ]
+            },
+            {
+                topic: "Make a net to represent the surface area of square-based and triangular-based pyramids",
+                questions: [
+                    { question: "Draw the net of a square-based pyramid with base 5 cm and slant height 8 cm.", answer: "One square of 5 cm sides and four triangles with base 5 cm and height 8 cm." },
+                    { question: "Explain how to find the surface area using the net for a triangular-based pyramid.", answer: "Calculate the area of each triangle (base and sides) and sum them." },
+                    { question: "Why is the net useful in finding the surface area of pyramids?", answer: "It unfolds the 3D shape into 2D shapes, making it easier to calculate areas." }
+                ]
+            }
+        ];
+
+        function generateQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = ''; // Clear previous questions
+
+            // Shuffle topics and pick three random ones
+            const shuffledTopics = topicsWithQuestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            // Add selected topics and questions to the page
+            shuffledTopics.forEach((topicObj) => {
+                const topicDiv = document.createElement('div');
+                topicDiv.className = 'question';
+                topicDiv.innerHTML = `<strong>Topic:</strong> ${topicObj.topic}<br><br>`;
+                
+                // Display questions under each topic
+                const shuffledQuestions = topicObj.questions.sort(() => 0.5 - Math.random());
+                shuffledQuestions.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.innerHTML = `<div class="question-text" onclick="toggleAnswer('answer-${topicObj.topic}-${index}')">${q.question}</div>
+                                             <div class="answer" id="answer-${topicObj.topic}-${index}">${q.answer}</div>`;
+                    topicDiv.appendChild(questionDiv);
+                });
+                
+                container.appendChild(topicDiv);
+            });
+        }
+
+        function toggleAnswer(answerId) {
+            const answerDiv = document.getElementById(answerId);
+            if (answerDiv.style.display === 'none' || answerDiv.style.display === '') {
+                answerDiv.style.display = 'block';
+            } else {
+                answerDiv.style.display = 'none';
+            }
+        }
+
+        // Generate initial set of questions when the page loads
+        window.onload = generateQuestions;
+    </script>
+    <footer>
+        <p>Created by cliffpackman@gmail.com on 24/9/2024</p>
+    </footer>
+</body>
+</html>

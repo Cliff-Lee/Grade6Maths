@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unit Review - Guess who</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .question {
+            background-color: #e0e0e0;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .question div {
+            cursor: pointer;
+            padding: 5px;
+        }
+        .answer {
+            display: none;
+            padding-top: 10px;
+            color: green;
+            font-style: italic;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        footer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Unit Review - Guess who</h1>
+    <img src="Unit5.png" alt="Unit Poster" width="300">
+    <div class="container" id="questions-container">
+        <!-- Questions will be dynamically inserted here -->
+    </div>
+
+    <button onclick="generateQuestions()">Refresh Questions</button>
+
+    <script>
+        const topicsWithQuestions = [
+            {
+                topic: "Identify and construct statistical questions",
+                questions: [
+                    { question: "What is a statistical question?", answer: "A question that can be answered by collecting data and has variability in that data." },
+                    { question: "Is 'How old am I?' a statistical question? Why or why not?", answer: "No, because it has a single, fixed answer with no variability." },
+                    { question: "Construct a statistical question about students' favorite subjects.", answer: "Example: 'What is the most preferred subject among students in grade 7?'" }
+                ]
+            },
+            {
+                topic: "Recognize statistical questions can produce a variety of answers through collecting data",
+                questions: [
+                    { question: "Explain why statistical questions produce varied answers.", answer: "Because they involve data collected from multiple sources or individuals, leading to variability." },
+                    { question: "Give an example of a statistical question that would result in varied data.", answer: "Example: 'How many hours do students spend on homework each week?'" },
+                    { question: "Why does asking 'What is the temperature today?' not qualify as a statistical question?", answer: "Because it seeks a specific value with no expected variability at a given time and place." }
+                ]
+            },
+            {
+                topic: "Display the responses to a statistical question in a table",
+                questions: [
+                    { question: "How can you organize data collected from a survey?", answer: "By displaying it in a table with categories and frequencies." },
+                    { question: "Create a simple frequency table for the number of pets owned by students.", answer: "A table listing number of pets (0,1,2,3,...) and the count of students for each." },
+                    { question: "Why are tables useful in statistics?", answer: "They organize data clearly, making it easier to interpret and analyze." }
+                ]
+            },
+            {
+                topic: "Construct and interpret dot plots and histograms using collected data",
+                questions: [
+                    { question: "What is a dot plot?", answer: "A graphical display of data using dots to represent frequency above a number line." },
+                    { question: "Explain how to interpret a histogram.", answer: "By analyzing the bars, which show the frequency of data within certain intervals." },
+                    { question: "Construct a histogram for test scores ranging from 60 to 100.", answer: "Create intervals (e.g., 60-69, 70-79, etc.) and draw bars representing the frequency in each interval." }
+                ]
+            },
+            {
+                topic: "Understand that the measures of center are used to represent a data set with a single value",
+                questions: [
+                    { question: "What are the common measures of center?", answer: "Mean, median, and mode." },
+                    { question: "Why do we use measures of center?", answer: "To summarize a data set with a single representative value." },
+                    { question: "Explain the difference between mean and median.", answer: "Mean is the average of all data points; median is the middle value when data is ordered." }
+                ]
+            },
+            {
+                topic: "Find the mean of a data set, including when there are missing values",
+                questions: [
+                    { question: "Calculate the mean of the data set: 5, 7, 9, 4.", answer: "Mean = (5+7+9+4)/4 = 6.25" },
+                    { question: "Find the missing value if the mean of 3, 5, x is 6.", answer: "3 + 5 + x = 18; x = 10" },
+                    { question: "Explain how to find the mean with missing data.", answer: "Use the mean formula and solve for the missing value." }
+                ]
+            },
+            {
+                topic: "Find the median of a data set (when there are odd or even number of data values)",
+                questions: [
+                    { question: "Find the median of: 2, 4, 7, 9, 10.", answer: "Median = 7" },
+                    { question: "Calculate the median of: 3, 5, 8, 12.", answer: "Median = (5+8)/2 = 6.5" },
+                    { question: "How do you find the median in an even-sized data set?", answer: "Find the average of the two middle numbers." }
+                ]
+            },
+            {
+                topic: "Understand that the measures of variation describe the variation of a data set using a single value",
+                questions: [
+                    { question: "What are common measures of variation?", answer: "Range and interquartile range (IQR)." },
+                    { question: "Why is variation important in statistics?", answer: "It shows how spread out the data is around the center." },
+                    { question: "Explain what a small range indicates about a data set.", answer: "Data points are clustered closely together." }
+                ]
+            },
+            {
+                topic: "Describe variation of a data set using the range and interquartile range",
+                questions: [
+                    { question: "Calculate the range of: 15, 22, 9, 17.", answer: "Range = 22 - 9 = 13" },
+                    { question: "What is the interquartile range (IQR)?", answer: "IQR = Q3 - Q1; it measures the middle 50% of data." },
+                    { question: "Find the IQR of the data set: 4, 6, 7, 9, 10, 12, 14.", answer: "Q1=6, Q3=12, IQR=12-6=6" }
+                ]
+            },
+            {
+                topic: "Recognize and determine outliers",
+                questions: [
+                    { question: "What is an outlier in a data set?", answer: "A data point significantly different from others." },
+                    { question: "Identify the outlier: 5, 6, 7, 50.", answer: "50 is the outlier." },
+                    { question: "Explain how outliers can be detected using IQR.", answer: "Values beyond 1.5 × IQR above Q3 or below Q1 are outliers." }
+                ]
+            },
+            {
+                topic: "Understand the effect of outliers on the measures of center",
+                questions: [
+                    { question: "How does an outlier affect the mean?", answer: "It can significantly increase or decrease the mean." },
+                    { question: "Does an outlier affect the median? Why or why not?", answer: "Typically, it has less effect on the median than the mean." },
+                    { question: "Explain why the mean is sensitive to extreme values.", answer: "Because it involves summing all values, so extreme values skew the total." }
+                ]
+            }
+        ];
+
+        function generateQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = ''; // Clear previous questions
+
+            // Shuffle topics and pick three random ones
+            const shuffledTopics = topicsWithQuestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            // Add selected topics and questions to the page
+            shuffledTopics.forEach((topicObj) => {
+                const topicDiv = document.createElement('div');
+                topicDiv.className = 'question';
+                topicDiv.innerHTML = `<strong>Topic:</strong> ${topicObj.topic}<br><br>`;
+                
+                // Display questions under each topic
+                const shuffledQuestions = topicObj.questions.sort(() => 0.5 - Math.random());
+                shuffledQuestions.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.innerHTML = `<div class="question-text" onclick="toggleAnswer('answer-${topicObj.topic}-${index}')">${q.question}</div>
+                                             <div class="answer" id="answer-${topicObj.topic}-${index}">${q.answer}</div>`;
+                    topicDiv.appendChild(questionDiv);
+                });
+                
+                container.appendChild(topicDiv);
+            });
+        }
+
+        function toggleAnswer(answerId) {
+            const answerDiv = document.getElementById(answerId);
+            if (answerDiv.style.display === 'none' || answerDiv.style.display === '') {
+                answerDiv.style.display = 'block';
+            } else {
+                answerDiv.style.display = 'none';
+            }
+        }
+
+        // Generate initial set of questions when the page loads
+        window.onload = generateQuestions;
+    </script>
+    <footer>
+        <p>Created by cliffpackman@gmail.com on 24/9/2024</p>
+    </footer>
+</body>
+</html>
