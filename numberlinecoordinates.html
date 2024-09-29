@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Math Exploration Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        canvas {
+            border: 1px solid black;
+            margin: 10px;
+        }
+        #controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .clickable-number, .clickable-coordinate {
+            margin: 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid black;
+            display: inline-block;
+            user-select: none;
+        }
+        #numberLineCanvas, #coordinatePlaneCanvas {
+            display: none;
+        }
+        #reflectControls {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interactive Math Exploration Tool</h1>
+
+    <div id="controls">
+        <button onclick="toggleView()">Switch View: Number Line / Coordinate Plane</button>
+        <button onclick="clearView()">Clear View</button>
+        
+        <!-- Reflect Buttons (initially hidden) -->
+        <div id="reflectControls">
+            <button onclick="reflectAcrossXAxis()">Reflect Across X-Axis</button>
+            <button onclick="reflectAcrossYAxis()">Reflect Across Y-Axis</button>
+        </div>
+
+        <!-- Number Line Clickable Buttons -->
+        <div id="numberLineControls">
+            <h3>Click a Number to Plot on Number Line and Compare</h3>
+            <div>
+                <span class="clickable-number" onclick="plotNumber(this)">-10</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-9</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-8</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-7</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-6</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-5</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-4</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-3</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-2</span>
+                <span class="clickable-number" onclick="plotNumber(this)">-1</span>
+                <span class="clickable-number" onclick="plotNumber(this)">0</span>
+                <span class="clickable-number" onclick="plotNumber(this)">1</span>
+                <span class="clickable-number" onclick="plotNumber(this)">2</span>
+                <span class="clickable-number" onclick="plotNumber(this)">3</span>
+                <span class="clickable-number" onclick="plotNumber(this)">4</span>
+                <span class="clickable-number" onclick="plotNumber(this)">5</span>
+                <span class="clickable-number" onclick="plotNumber(this)">6</span>
+                <span class="clickable-number" onclick="plotNumber(this)">7</span>
+                <span class="clickable-number" onclick="plotNumber(this)">8</span>
+                <span class="clickable-number" onclick="plotNumber(this)">9</span>
+                <span class="clickable-number" onclick="plotNumber(this)">10</span>
+            </div>
+        </div>
+
+        <!-- Coordinate Plane Clickable Buttons -->
+        <div id="coordinatePlaneControls" style="display: none;">
+            <h3>Click a Coordinate to Plot on Coordinate Plane and Compare</h3>
+            <div>
+                <span class="clickable-coordinate" onclick="plotCoordinate(1, 1)">(1, 1)</span>
+                <span class="clickable-coordinate" onclick="plotCoordinate(-1, -1)">(-1, -1)</span>
+                <span class="clickable-coordinate" onclick="plotCoordinate(2, 3)">(2, 3)</span>
+                <span class="clickable-coordinate" onclick="plotCoordinate(-3, 2)">(-3, 2)</span>
+                <span class="clickable-coordinate" onclick="plotCoordinate(4, -5)">(4, -5)</span>
+                <span class="clickable-coordinate" onclick="plotCoordinate(-4, -3)">(-4, -3)</span>
+                <span class="clickable-coordinate" onclick="plotCoordinate(5, 5)">(5, 5)</span>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="numberLineCanvas" width="800" height="100"></canvas>
+    <canvas id="coordinatePlaneCanvas" width="400" height="400"></canvas>
+
+    <div id="info"></div>
+
+    <script>
+        const numberLineCanvas = document.getElementById('numberLineCanvas');
+        const numberCtx = numberLineCanvas.getContext('2d');
+        const coordinatePlaneCanvas = document.getElementById('coordinatePlaneCanvas');
+        const coordinateCtx = coordinatePlaneCanvas.getContext('2d');
+        const infoDiv = document.getElementById("info");
+
+        let selectedNumbers = [];
+        let selectedCoordinates = [];
+        let view = "numberLine"; // Default view is number line
+        let lastPlottedCoordinate = null; // Store the last coordinate for reflection
+
+        function init() {
+            drawNumberLine();
+            document.getElementById("numberLineCanvas").style.display = "block"; // Show number line by default
+        }
+
+        // Number line drawing logic
+        function drawNumberLine() {
+            numberCtx.clearRect(0, 0, numberLineCanvas.width, numberLineCanvas.height);
+            numberCtx.beginPath();
+            numberCtx.moveTo(0, 50);
+            numberCtx.lineTo(800, 50);
+            numberCtx.stroke();
+            for (let i = 0; i <= 800; i += 40) {
+                let num = (i / 40) - 10;
+                numberCtx.fillText(num, i - 10, 40);
+                numberCtx.moveTo(i, 45);
+                numberCtx.lineTo(i, 55);
+                numberCtx.stroke();
+            }
+        }
+
+        // Coordinate plane drawing logic
+        function drawCoordinatePlane() {
+            coordinateCtx.clearRect(0, 0, coordinatePlaneCanvas.width, coordinatePlaneCanvas.height);
+            coordinateCtx.beginPath();
+            coordinateCtx.moveTo(200, 0);  // y-axis
+            coordinateCtx.lineTo(200, 400);
+            coordinateCtx.moveTo(0, 200);  // x-axis
+            coordinateCtx.lineTo(400, 200);
+            coordinateCtx.stroke();
+
+            // Add x and y axis labels with consistent scaling
+            for (let i = -10; i <= 10; i++) {
+                const x = 200 + i * 20;
+                const y = 200 - i * 20;
+
+                // x-axis labels
+                if (i !== 0) {
+                    coordinateCtx.fillText(i, x - 5, 215);
+                    coordinateCtx.moveTo(x, 195);
+                    coordinateCtx.lineTo(x, 205);
+                    coordinateCtx.stroke();
+                }
+
+                // y-axis labels
+                if (i !== 0) {
+                    coordinateCtx.fillText(i, 185, y + 5);
+                    coordinateCtx.moveTo(195, y);
+                    coordinateCtx.lineTo(205, y);
+                    coordinateCtx.stroke();
+                }
+            }
+        }
+
+        // Toggle between number line and coordinate plane
+        function toggleView() {
+            if (view === "numberLine") {
+                view = "coordinatePlane";
+                document.getElementById("numberLineCanvas").style.display = "none";
+                document.getElementById("coordinatePlaneCanvas").style.display = "block";
+                document.getElementById("numberLineControls").style.display = "none";
+                document.getElementById("coordinatePlaneControls").style.display = "block";
+                document.getElementById("reflectControls").style.display = "block"; // Show reflection buttons
+                selectedNumbers = [];  // Clear selected numbers when switching
+            } else {
+                view = "numberLine";
+                document.getElementById("numberLineCanvas").style.display = "block";
+                document.getElementById("coordinatePlaneCanvas").style.display = "none";
+                document.getElementById("numberLineControls").style.display = "block";
+                document.getElementById("coordinatePlaneControls").style.display = "none";
+                document.getElementById("reflectControls").style.display = "none"; // Hide reflection buttons
+                selectedCoordinates = [];  // Clear selected coordinates when switching
+            }
+            infoDiv.innerHTML = ''; // Clear info on view change
+        }
+
+        // Function to clear the view after selecting two points
+        function clearView() {
+            if (view === "numberLine") {
+                drawNumberLine();
+                selectedNumbers = [];
+            } else {
+                drawCoordinatePlane();
+                selectedCoordinates = [];
+            }
+            infoDiv.innerHTML = '';  // Clear info display
+        }
+
+        // Plot number and compare two selected numbers on the number line
+        function plotNumber(element) {
+            const num = parseInt(element.innerHTML);
+            const x = 400 + num * 40;
+
+            // Clear previous highlights
+            clearHighlight(numberCtx, drawNumberLine);
+
+            // Highlight the selected number
+            numberCtx.fillStyle = 'red';
+            numberCtx.beginPath();
+            numberCtx.arc(x, 50, 7, 0, 2 * Math.PI);  // Larger circle for highlight
+            numberCtx.fill();
+
+            selectedNumbers.push(num);
+
+            if (selectedNumbers.length === 2) {
+                const [num1, num2] = selectedNumbers;
+                const absDifference = Math.abs(num1 - num2);
+                const comparison = num1 > num2 ? `${num1} > ${num2}` : `${num1} < ${num2}`;
+
+                // Draw a line between the two numbers
+                numberCtx.strokeStyle = 'blue';
+                numberCtx.beginPath();
+                numberCtx.moveTo(400 + num1 * 40, 50);
+                numberCtx.lineTo(400 + num2 * 40, 50);
+                numberCtx.stroke();
+
+                infoDiv.innerHTML = `
+                    Comparison: ${comparison}<br>
+                    Absolute Difference: ${absDifference}<br>
+                    Opposite of ${num1}: ${-num1}, Absolute Value of ${num1}: ${Math.abs(num1)}<br>
+                    Opposite of ${num2}: ${-num2}, Absolute Value of ${num2}: ${Math.abs(num2)}
+                `;
+            }
+        }
+
+        // Plot coordinate and compare two selected points on the coordinate plane
+        function plotCoordinate(x, y) {
+            const plotX = 200 + x * 20;
+            const plotY = 200 - y * 20;
+
+            // Clear previous highlights
+            clearHighlight(coordinateCtx, drawCoordinatePlane);
+
+            // Highlight the selected coordinate
+            coordinateCtx.fillStyle = 'blue';
+            coordinateCtx.beginPath();
+            coordinateCtx.arc(plotX, plotY, 7, 0, 2 * Math.PI);  // Larger circle for highlight
+            coordinateCtx.fill();
+
+            selectedCoordinates.push([x, y]);
+            lastPlottedCoordinate = [x, y];
+
+            if (selectedCoordinates.length === 2) {
+                const [[x1, y1], [x2, y2]] = selectedCoordinates;
+                const horizontalDistance = Math.abs(x1 - x2);
+                const verticalDistance = Math.abs(y1 - y2);
+
+                // Detect reflections across the axes
+                const reflectionX = x1 === -x2 && y1 === y2;
+                const reflectionY = y1 === -y2 && x1 === x2;
+                const reflectionBoth = x1 === -x2 && y1 === -y2;
+
+                // Draw horizontal and vertical lines between the points
+                coordinateCtx.strokeStyle = 'green';
+                coordinateCtx.beginPath();
+                coordinateCtx.moveTo(200 + x1 * 20, 200 - y1 * 20);
+                coordinateCtx.lineTo(200 + x2 * 20, 200 - y1 * 20); // Horizontal line
+                coordinateCtx.moveTo(200 + x2 * 20, 200 - y1 * 20);
+                coordinateCtx.lineTo(200 + x2 * 20, 200 - y2 * 20); // Vertical line
+                coordinateCtx.stroke();
+
+                let reflectionInfo = '';
+                if (reflectionBoth) {
+                    reflectionInfo = 'The points are reflections of each other across both axes.';
+                } else if (reflectionX) {
+                    reflectionInfo = 'The points are reflections of each other across the y-axis.';
+                } else if (reflectionY) {
+                    reflectionInfo = 'The points are reflections of each other across the x-axis.';
+                }
+
+                infoDiv.innerHTML = `
+                    Horizontal Distance: ${horizontalDistance}<br>
+                    Vertical Distance: ${verticalDistance}<br>
+                    Quadrant of (${x1}, ${y1}): ${getQuadrant(x1, y1)}<br>
+                    Quadrant of (${x2}, ${y2}): ${getQuadrant(x2, y2)}<br>
+                    ${reflectionInfo}
+                `;
+            }
+        }
+
+        // Reflect across X-axis
+        function reflectAcrossXAxis() {
+            if (!lastPlottedCoordinate) {
+                infoDiv.innerHTML = "Please plot a point before reflecting.";
+                return;
+            }
+
+            const [x, y] = lastPlottedCoordinate;
+            const reflectedY = -y;
+            plotCoordinate(x, reflectedY);
+            infoDiv.innerHTML = `Reflected across X-axis: (${x}, ${reflectedY})`;
+        }
+
+        // Reflect across Y-axis
+        function reflectAcrossYAxis() {
+            if (!lastPlottedCoordinate) {
+                infoDiv.innerHTML = "Please plot a point before reflecting.";
+                return;
+            }
+
+            const [x, y] = lastPlottedCoordinate;
+            const reflectedX = -x;
+            plotCoordinate(reflectedX, y);
+            infoDiv.innerHTML = `Reflected across Y-axis: (${reflectedX}, ${y})`;
+        }
+
+        function getQuadrant(x, y) {
+            if (x > 0 && y > 0) return "I";
+            if (x < 0 && y > 0) return "II";
+            if (x < 0 && y < 0) return "III";
+            if (x > 0 && y < 0) return "IV";
+            return "On Axis";
+        }
+
+        // Clear the current highlight (clear the canvas and redraw)
+        function clearHighlight(ctx, drawFunction) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            drawFunction(); // Redraw the canvas without highlights
+        }
+
+        init();  // Initialize with number line shown
+    </script>
+</body>
+    <footer>
+        <p>Created by cliffpackman@gmail.com on 1/10/2024</p>
+    </footer>
+</html>
